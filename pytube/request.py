@@ -100,8 +100,9 @@ def stream(url, headers=None, chunk_size=default_chunk_size, range_size=default_
     while downloaded < file_size:
         stop_pos = min(downloaded + range_size, file_size) - 1
         range_header = f"bytes={downloaded}-{stop_pos}"
+        headers.update({"Range": range_header})
         response = _execute_request(
-            url, method="GET", headers={"Range": range_header}.update(headers)
+            url, method="GET", headers=headers
         )
         if file_size == range_size:
             try:
