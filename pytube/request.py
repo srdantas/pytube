@@ -86,8 +86,9 @@ def seq_stream(url, chunk_size=default_chunk_size, range_size=default_range_size
     return  # pylint: disable=R1711
 
 
-def stream(url, chunk_size=default_chunk_size, range_size=default_range_size):
+def stream(url, headers=None, chunk_size=default_chunk_size, range_size=default_range_size):
     """Read the response in chunks.
+    :param headers: custom headers
     :param str url: The URL to perform the GET request for.
     :param int chunk_size: The size in bytes of each chunk. Defaults to 4KB
     :param int range_size: The size in bytes of each range request. Defaults
@@ -100,7 +101,7 @@ def stream(url, chunk_size=default_chunk_size, range_size=default_range_size):
         stop_pos = min(downloaded + range_size, file_size) - 1
         range_header = f"bytes={downloaded}-{stop_pos}"
         response = _execute_request(
-            url, method="GET", headers={"Range": range_header}
+            url, method="GET", headers={"Range": range_header}.update(headers)
         )
         if file_size == range_size:
             try:

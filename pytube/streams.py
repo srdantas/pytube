@@ -31,7 +31,7 @@ class Stream:
     """Container for stream manifest data."""
 
     def __init__(
-        self, stream: Dict, player_config_args: Dict, monostate: Monostate
+        self, stream: Dict, player_config_args: Dict, monostate: Monostate, headers: Dict[str, str] = None
     ):
         """Construct a :class:`Stream <Stream>`.
 
@@ -87,6 +87,8 @@ class Stream:
 
         # The player configuration, contains info like the video title.
         self.player_config_args = player_config_args
+
+        self.headers = headers
 
     @property
     def is_adaptive(self) -> bool:
@@ -257,7 +259,7 @@ class Stream:
 
         with open(file_path, "wb") as fh:
             try:
-                for chunk in request.stream(self.url):
+                for chunk in request.stream(self.url, self.headers):
                     # reduce the (bytes) remainder by the length of the chunk.
                     bytes_remaining -= len(chunk)
                     # send to the on_progress callback.
@@ -334,7 +336,7 @@ class Stream:
 
         """
         file_handler.write(chunk)
-        logger.debug("download remaining: %s", bytes_remaining)
+        logger.info("download remaining: %s", bytes_remaining)
         if self._monostate.on_progress:
             self._monostate.on_progress(self, chunk, bytes_remaining)
 
